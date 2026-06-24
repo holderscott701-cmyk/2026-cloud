@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>2026校招入职指南</title>
+<style>
+/* ══════ Design Tokens ══════ */
+:root {
+  --bg:        #f5f6f9;
+  --surface:   #ffffff;
+  --brand:     #1a56db;
+  --brand-deep:#0d3d99;
+  --brand-pale:#eef3fd;
+  --accent:    #0d9488;
+  --accent-pale:#eaf5f4;
+  --warn:      #d97706;
+  --warn-pale: #fffbeb;
+  --text:      #1a2030;
+  --text-soft: #5a6270;
+  --text-muted:#8b92a0;
+  --border:    #e4e7ef;
+  --radius:    12px;
+  --shadow:    0 1px 4px rgba(15,20,40,0.04), 0 4px 16px rgba(15,20,40,0.06);
+  --font:      "PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
+}
+
+/* ══════ Reset ══════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ══════ Header ══════ */
+.header{
+  background:linear-gradient(135deg,#0b1a38 0%,#112350 40%,#152a62 100%);
+  color:#fff;
+  padding:32px 40px 28px;
+  display:flex;align-items:center;gap:20px;
+  flex-shrink:0;
+  position:relative;overflow:hidden;
+}
+.header::after{
+  content:'';position:absolute;
+  top:-60px;right:-40px;
+  width:260px;height:260px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(26,86,219,0.22) 0%,transparent 70%);
+  pointer-events:none;
+}
+.header-text{position:relative;z-index:1}
+.header-text .logo-text{font-size:10px;letter-spacing:4px;opacity:.5;margin-bottom:6px}
+.header-text h1{font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:.5px}
+.header-text p{font-size:13px;opacity:.7}
+
+/* ══════ Admin Bar ══════ */
+.admin-bar{
+  display:none;
+  position:sticky;top:0;z-index:50;
+  background:#0d2f7a;color:#fff;
+  padding:10px 24px;gap:10px;
+  align-items:center;flex-shrink:0;
+}
+.admin-bar.visible{display:flex}
+.admin-bar-title{font-size:13px;font-weight:700;flex:1}
+.admin-bar button{padding:6px 15px;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
+.btn-add-guide{background:rgba(255,255,255,.15);color:#fff}
+.btn-add-guide:hover{background:rgba(255,255,255,.28)}
+.btn-exit-admin{background:rgba(255,255,255,.1);color:rgba(255,255,255,.65)}
+.btn-exit-admin:hover{background:rgba(255,255,255,.22);color:#fff}
+
+/* ══════ Layout ══════ */
+.layout{display:flex;flex:1;min-height:0}
+
+/* ══════ Sidebar ══════ */
+.sidebar{
+  width:224px;flex-shrink:0;background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:24px 0 36px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sidebar-section-label{
+  font-size:10px;font-weight:700;letter-spacing:3px;
+  color:var(--text-muted);padding:0 20px 10px;
+  text-transform:uppercase;
+}
+.nav-group{margin-bottom:2px}
+.nav-group-title{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px 10px 20px;
+  font-size:13px;font-weight:600;color:var(--text-soft);
+  cursor:pointer;transition:all .2s;
+  border-left:3px solid transparent;
+  user-select:none;
+}
+.nav-group-title:hover{background:var(--brand-pale);color:var(--brand)}
+.nav-group-title.active{color:var(--brand);background:var(--brand-pale);border-left-color:var(--brand)}
+.nav-group-title .nav-icon{font-size:16px}
+.nav-group-title .nav-label{flex:1}
+.drag-handle{display:none;cursor:grab;font-size:13px;color:var(--text-muted);padding:0 3px;line-height:1}
+.drag-handle:active{cursor:grabbing}
+.admin-mode .drag-handle{display:inline-flex}
+.admin-mode .nav-group-title.dragging{opacity:0.35}
+.admin-mode .nav-group-title.drag-over{border-top:3px solid var(--brand);margin-top:-3px}
+.nav-del-btn{display:none;background:none;border:none;color:#f87171;cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;line-height:1}
+.nav-del-btn:hover{background:#fef2f2}
+.admin-mode .nav-del-btn{display:inline-flex}
+
+/* ══════ Main ══════ */
+.main{flex:1;padding:32px 40px 56px;overflow-y:auto;min-width:0}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════ Page Title ══════ */
+.page-title{
+  font-size:21px;font-weight:700;color:var(--text);
+  margin-bottom:22px;display:flex;align-items:center;gap:10px;
+}
+.page-title .pt-icon{font-size:23px}
+
+/* ══════ Card ══════ */
+.card{
+  background:var(--surface);border-radius:var(--radius);
+  box-shadow:0 1px 3px rgba(15,20,40,.04);
+  border:1px solid var(--border);
+  margin-bottom:16px;overflow:hidden;
+  transition:box-shadow .2s,border-color .2s;
+}
+.card:hover{box-shadow:var(--shadow);border-color:#d4d9e2}
+.card-header{
+  display:flex;align-items:center;gap:10px;
+  padding:16px 22px;
+  background:linear-gradient(90deg,#f8fafd,#fdfdff);
+  border-bottom:1px solid var(--border);
+}
+.card-header .icon{font-size:18px}
+.card-header h2{font-size:15px;font-weight:700;color:var(--text);flex:1}
+.card-body{padding:20px 24px}
+.card-edit-btn{display:none;background:var(--brand);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
+.card-edit-btn:hover{background:var(--brand-deep)}
+.card-del-btn{display:none;background:#fef2f2;color:#ef4444;border:none;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;margin-left:6px}
+.card-del-btn:hover{background:#fee2e2}
+.admin-mode .card-edit-btn,.admin-mode .card-del-btn{display:inline-flex}
+.add-card-btn{display:none;width:100%;padding:12px;border:2px dashed var(--border);border-radius:var(--radius);background:var(--surface);color:var(--brand);font-size:13px;font-weight:600;cursor:pointer;margin-top:2px;transition:.2s}
+.add-card-btn:hover{background:var(--brand-pale);border-color:var(--brand)}
+.admin-mode .add-card-btn{display:block}
+
+/* ══════ Section Title ══════ */
+.section-title{
+  font-size:13px;font-weight:700;color:var(--text);
+  margin:18px 0 9px;padding-left:10px;
+  border-left:3px solid var(--brand);
+}
+.section-title:first-child{margin-top:0}
+
+/* ══════ Content ══════ */
+p,li{font-size:14px;line-height:1.8;color:var(--text-soft)}
+ul,ol{padding-left:20px}
+li{margin-bottom:4px}
+ul li::marker{color:var(--brand)}
+
+/* ══════ Boxes ══════ */
+.info-box{background:var(--brand-pale);border:1px solid #d0defa;border-radius:10px;padding:14px 18px;margin:12px 0}
+.info-box .label{font-size:11px;font-weight:700;color:var(--brand);margin-bottom:6px;letter-spacing:1px}
+.info-box p{font-size:13px;color:#1e40af;margin:2px 0}
+.tip-box{background:var(--warn-pale);border:1px solid #fde68a;border-radius:10px;padding:14px 18px;margin:12px 0}
+.tip-box .label{font-size:11px;font-weight:700;color:var(--warn);margin-bottom:6px}
+.tip-box p,.tip-box li{font-size:13px;color:#78350f}
+
+/* ══════ Table ══════ */
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+th{background:var(--brand);color:#fff;padding:9px 14px;text-align:left;font-weight:600;font-size:12px}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text-soft)}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:#f8fafd}
+
+/* ══════ Q&A ══════ */
+.qa-item{margin-bottom:14px}
+.qa-q{font-size:14px;font-weight:700;color:var(--brand);margin-bottom:4px}
+.qa-a{font-size:14px;color:var(--text-soft);line-height:1.75;padding-left:16px;border-left:2px solid var(--border);margin-left:2px}
+
+/* ══════ Route Card ══════ */
+.route-card{background:#f8fafd;border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:12px}
+.route-title{font-size:13px;font-weight:700;color:var(--brand);margin-bottom:8px}
+.route-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;font-size:13px;color:var(--text-soft)}
+.route-row .key{min-width:78px;font-weight:600;color:var(--text)}
+
+/* ══════ Step List ══════ */
+.step-list{counter-reset:step;padding-left:0;list-style:none}
+.step-list li{counter-increment:step;display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.step-list li::before{content:counter(step);min-width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+
+/* ══════ Modal ══════ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,20,40,.5);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:16px;padding:28px;width:90%;max-width:520px;box-shadow:0 16px 48px rgba(15,20,40,.18);max-height:90vh;overflow-y:auto;animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--text-soft);margin-bottom:6px;letter-spacing:.5px}
+.form-group input[type=text],.form-group input[type=password]{width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none;transition:border-color .2s}
+.form-group input:focus{border-color:var(--brand)}
+.form-group .edit-area{width:100%;min-height:220px;padding:12px;border:2px solid var(--border);border-radius:8px;font-size:13px;line-height:1.7;outline:none;overflow-y:auto}
+.form-group .edit-area:focus{border-color:var(--brand)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.modal-actions button{padding:9px 22px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+.btn-cancel{background:var(--bg);color:var(--text-soft)}
+.btn-cancel:hover{background:var(--border)}
+.btn-confirm{background:var(--brand);color:#fff}
+.btn-confirm:hover{background:var(--brand-deep)}
+.err-msg{color:#ef4444;font-size:13px;margin-top:8px;display:none}
+
+/* ══════ Toast ══════ */
+.toast{
+  position:fixed;bottom:80px;right:24px;
+  background:var(--text);color:#fff;
+  padding:12px 20px;border-radius:10px;
+  font-size:13px;z-index:400;
+  opacity:0;transform:translateY(10px);
+  transition:all .3s;pointer-events:none;
+  box-shadow:0 8px 24px rgba(15,20,40,.2);
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ══════ Admin Gear ══════ */
+.admin-gear{
+  position:fixed;bottom:24px;right:24px;
+  width:42px;height:42px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  font-size:18px;cursor:pointer;
+  display:none;align-items:center;justify-content:center;
+  z-index:200;
+  box-shadow:0 2px 12px rgba(15,20,40,.12);
+  transition:all .25s;
+  color:var(--text-muted);
+}
+.admin-gear:hover{
+  background:var(--brand);color:#fff;
+  transform:rotate(45deg);
+  box-shadow:0 4px 20px rgba(26,86,219,.3);
+  border-color:var(--brand);
+}
+
+/* ══════ Footer ══════ */
+.footer{
+  text-align:center;font-size:11px;color:var(--text-muted);
+  padding:14px;background:var(--surface);
+  border-top:1px solid var(--border);
+}
+
+/* ══════ Mobile ══════ */
+.mobile-bar{display:none;align-items:center;gap:12px;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px}
+.hamburger{background:none;border:none;cursor:pointer;font-size:20px;color:var(--text)}
+.mobile-bar-title{font-size:14px;font-weight:700;color:var(--text)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,20,40,.35);z-index:99}
+.sidebar-overlay.open{display:block}
+
+@media(max-width:700px){
+  .layout{flex-direction:column}
+  .sidebar{position:fixed;top:0;left:-232px;width:232px;height:100vh;z-index:100;transition:left .25s ease;padding-top:56px;box-shadow:0 0 40px rgba(15,20,40,.2)}
+  .sidebar.open{left:0}
+  .mobile-bar{display:flex}
+  .main{padding:20px 16px 50px}
+  .header{padding:20px 16px}
+  .header-text h1{font-size:18px}
+  .admin-bar{padding:8px 12px;gap:6px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important}
+}
+</style>
+</head>
+<body class="">
+
+<div class="header">
+  <div class="header-text">
+    <div class="logo-text">浩鲸云计算科技股份有限公司</div>
+    <h1>2026校招 · 入职指南</h1>
+    <p>欢迎加入浩鲸大家庭，点击左侧目录查看对应指引</p>
+  </div>
+</div>
+
+<div class="admin-bar" id="admin-bar">
+  <span class="admin-bar-title">⚙ 管理员模式</span>
+  <button class="btn-add-guide" onclick="showAddGuide()">+ 新增指南</button>
+  <button class="btn-exit-admin" onclick="exitAdmin()">✕ 退出编辑</button>
+</div>
+
+<div class="mobile-bar">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <span class="mobile-bar-title" id="mobile-title">入职材料上传</span>
+</div>
+<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section-label">入职指南目录</div>
+    <div id="sidebar-nav"><div class="nav-group"><div class="nav-group-title" onclick="showGuide('medical')" draggable="true" data-index="0" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)" ondragend="dragEnd(event)"><span class="drag-handle" title="拖拽排序">⠿</span><span class="nav-icon">🏥</span><span class="nav-label">体检指南</span><button class="nav-del-btn" onclick="event.stopPropagation();deleteGuide('medical')" title="删除">🗑</button></div></div><div class="nav-group"><div class="nav-group-title active" onclick="showGuide('onboard')" draggable="true" data-index="1" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)" ondragend="dragEnd(event)"><span class="drag-handle" title="拖拽排序">⠿</span><span class="nav-icon">📋</span><span class="nav-label">入职材料上传</span><button class="nav-del-btn" onclick="event.stopPropagation();deleteGuide('onboard')" title="删除">🗑</button></div></div><div class="nav-group"><div class="nav-group-title" onclick="showGuide('subsidy')" draggable="true" data-index="2" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)" ondragend="dragEnd(event)"><span class="drag-handle" title="拖拽排序">⠿</span><span class="nav-icon">💰</span><span class="nav-label">通用报销指南</span><button class="nav-del-btn" onclick="event.stopPropagation();deleteGuide('subsidy')" title="删除">🗑</button></div></div><div class="nav-group"><div class="nav-group-title" onclick="showGuide('salary')" draggable="true" data-index="3" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)" ondragend="dragEnd(event)"><span class="drag-handle" title="拖拽排序">⠿</span><span class="nav-icon">💳</span><span class="nav-label">工资卡办理</span><button class="nav-del-btn" onclick="event.stopPropagation();deleteGuide('salary')" title="删除">🗑</button></div></div><div class="nav-group"><div class="nav-group-title" onclick="showGuide('bus')" draggable="true" data-index="4" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)" ondragend="dragEnd(event)"><span class="drag-handle" title="拖拽排序">⠿</span><span class="nav-icon">🚌</span><span class="nav-label">班车路线</span><button class="nav-del-btn" onclick="event.stopPropagation();deleteGuide('bus')" title="删除">🗑</button></div></div><div class="nav-group"><div class="nav-group-title dragging" onclick="showGuide('party')" draggable="true" data-index="5" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)" ondragend="dragEnd(event)"><span class="drag-handle" title="拖拽排序">⠿</span><span class="nav-icon">🏛️</span><span class="nav-label">党组织关系转移</span><button class="nav-del-btn" onclick="event.stopPropagation();deleteGuide('party')" title="删除">🗑</button></div></div></div>
+  </nav>
+  <main class="main" id="main-content"><div class="tab-panel" id="panel-medical"><div class="page-title"><span class="pt-icon">🏥</span> 体检指南</div><div class="card"><div class="card-header"><span class="icon">🏨</span><h2>体检机构 &amp; 预约方式</h2><button class="card-edit-btn" onclick="editCard('medical',0)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('medical',0)">🗑 删除</button></div><div class="card-body"><div class="section-title">优先选择：公司合作机构 — 爱康国宾</div><p>需提前 <strong>3个工作日</strong> 通过以下二维码自助扫码预约：</p><div style="margin:14px 0"><img src="data:image/png;base64,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" style="width:180px;height:180px;display:block;border:1px solid #e2e8f0;border-radius:8px" alt="体检预约二维码"><p style="font-size:12px;color:#718096;margin-top:6px">微信扫码预约体检</p></div><div class="section-title">无爱康国宾的城市</div><p>条件允许的情况下推荐前往临近城市合作机构体检；若距离过远，可自行选择<strong>三甲及以上医院 / 正规体检机构</strong>。</p><div class="section-title">体检截止时间</div><div class="tip-box"><div class="label">⏰ 重要</div><p>请在 <strong>5月17日前</strong> 完成体检。</p></div><div class="section-title">爱康国宾预约流程</div><ol class="step-list"><li>微信扫码，进入界面后点击「预约」</li><li>登录账号：<strong>个人身份证号</strong>，默认密码：<strong>123123</strong></li><li>点击预约，核对个人信息，就近选择体检城市、机构及时间</li></ol></div></div><div class="card"><div class="card-header"><span class="icon">🩺</span><h2>体检项目（必检六项）</h2><button class="card-edit-btn" onclick="editCard('medical',1)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('medical',1)">🗑 删除</button></div><div class="card-body"><div class="info-box"><div class="label">📋 必检项目</div><p>血常规 &nbsp;|&nbsp; 尿常规 &nbsp;|&nbsp; 肝功能 &nbsp;|&nbsp; 心电图 &nbsp;|&nbsp; 腹部彩超（肝胆胰脾肾）&nbsp;|&nbsp; 胸透</p></div><p style="margin-top:10px">以上六项<strong>缺一不可</strong>，自行选择机构时请提前确认项目是否齐全，避免遗漏。</p></div></div><div class="card"><div class="card-header"><span class="icon">💰</span><h2>体检费用报销</h2><button class="card-edit-btn" onclick="editCard('medical',2)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('medical',2)">🗑 删除</button></div><div class="card-body"><div class="section-title">公司合作机构（爱康国宾）</div><p>无需自行支付体检费用，预约后携带<strong>身份证</strong>直接前往线下体检即可。</p><div class="section-title">自行选择机构</div><p>需先行支付，报销费用仅限 <strong>250元以内</strong>，超出部分由个人承担。体检完成后请按以下抬头开具发票留存，正式入职后统一安排报销对接。</p><div class="info-box" style="margin-top:12px"><div class="label">📄 发票抬头信息</div><p><strong>发票类型：</strong>普通发票即可</p><p><strong>公司名称：</strong>浩鲸云计算科技股份有限公司</p><p><strong>纳税人识别号：</strong>91320100745379000T</p><p><strong>地址及电话：</strong>南京市雨花台区软件大道178号1幢&nbsp;025-66669555</p><p><strong>开户行及账号：</strong>招商银行股份有限公司南京城东支行&nbsp;252681183310001</p></div><div class="tip-box" style="margin-top:14px"><div class="label">💡 体检注意事项</div><p>体检前1-2天请保持清淡饮食，勿熬夜饮酒；体检当天务必<strong>空腹</strong>前往；女性请避开生理期。</p></div></div></div><button class="add-card-btn" onclick="showAddCard('medical')">＋ 新增卡片</button></div><div class="tab-panel active" id="panel-onboard"><div class="page-title"><span class="pt-icon">📋</span> 入职材料上传</div><div class="card"><div class="card-header"><span class="icon">🔗</span><h2>提交路径</h2><button class="card-edit-btn" onclick="editCard('onboard',0)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('onboard',0)">🗑 删除</button></div><div class="card-body"><div class="info-box"><div class="label">📌 提交入口</div><p><strong>提交链接：</strong>https://ruzhi.iwhalecloud.com/</p><p><strong>登录方式：</strong>姓名 + 手机号 + 验证码</p></div></div></div><div class="card"><div class="card-header"><span class="icon">📅</span><h2>提交时间</h2><button class="card-edit-btn" onclick="editCard('onboard',1)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('onboard',1)">🗑 删除</button></div><div class="card-body"><ol class="step-list"><li>05月27日：开放提交路径的链接通道</li><li>06月15日：完成除双证及学信网以外所有电子版材料的上传（若双证 &amp; 学信网在06月15日前拿到，一并提交即可）</li><li>中途可添加材料，点击保存草稿；已有的资料先提交上传</li></ol></div></div><div class="card"><div class="card-header"><span class="icon">📄</span><h2>材料明细</h2><button class="card-edit-btn" onclick="editCard('onboard',2)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('onboard',2)">🗑 删除</button></div><div class="card-body"><ul><li><strong>个人信息填写：</strong>家庭住址精确到门牌号；工作经历至少填写三段（不满三段填"无"，实习经历可填写）；培训经历非必填</li><li><strong>身份证：</strong>图片格式，国徽面 + 照片面，清晰完整，<strong>勿添加任何水印</strong></li><li><strong>学历证书：</strong>图片格式，学位证 + 毕业证，清晰完整，无水印</li><li><strong>教育部学历 / 学位 / 学籍电子注册备案表：</strong>图片格式，学信网下载，需露出认证报告底部二维码</li><li><strong>体检报告：</strong>PDF格式，包含必检六项</li><li><strong>白底证件照：</strong>图片格式，头部证件照，像素清晰，无遮挡无阴影</li><li><strong>英语证书：</strong>四级 / 六级证书照片（未通过四级可用学信网学籍/学历/学位验证报告代替）</li><li><strong>行业相关证书（ACP、PMP、Redhat等）：</strong>非必传</li></ul></div></div><div class="card"><div class="card-header"><span class="icon">❓</span><h2>常见问题 Q&amp;A</h2><button class="card-edit-btn" onclick="editCard('onboard',3)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('onboard',3)">🗑 删除</button></div><div class="card-body"><div class="tip-box"><div class="label">📢 温馨提示</div><p>提交过程中如遇问题，请优先查看Q&amp;A；若仍有疑问可联系入职侧HR陈啟文，钉钉：18205063236（添加时请备注姓名）</p></div><div class="qa-item"><div class="qa-q">Q1：无法进入材料提交页面怎么办？</div><div class="qa-a"><strong>电脑：</strong>切换浏览器、清除缓存、重启浏览器<br><strong>手机：</strong>核对手机号码、切换网络</div></div><div class="qa-item"><div class="qa-q">Q2：登录页面显示"姓名或手机号错误"怎么办？</div><div class="qa-a">联系HR核对手机号码。</div></div><div class="qa-item"><div class="qa-q">Q3：没有学位证书或英语证书怎么办？</div><div class="qa-a">可使用学信网截图替代，如有问题HR会单独联系。</div></div><div class="qa-item"><div class="qa-q">Q4：体检报告如何下载PDF格式？</div><div class="qa-a"><strong>指定机构：</strong>扫描体检预约二维码登录后可查看并下载报告<br><strong>其他机构：</strong>纸质报告拍照后转换为PDF上传</div></div><div class="qa-item"><div class="qa-q">Q5：体检报告必检哪六项？</div><div class="qa-a">血常规、尿常规、肝功能、心电图、腹部彩超、胸透。</div></div><div class="qa-item"><div class="qa-q">Q6：体检有异常项怎么办？</div><div class="qa-a">上传已拿到的全部体检报告，等待HR审核。若HR未驳回并备注复查原因，则异常项不影响入职。</div></div><div class="qa-item"><div class="qa-q">Q7：材料上传不全可以点击提交吗？</div><div class="qa-a">可先上传已有材料后点击<strong>保存草稿</strong>，待材料齐全后再点击提交。</div></div><div class="qa-item"><div class="qa-q">Q8：身份证、毕业证、学位证上传报错怎么办？</div><div class="qa-a">三类证件均设有OCR识别，识别成功后请核对关键信息是否有误并手动修改；若OCR识别失败，可直接在右侧手动输入关键信息并确认回填。</div></div><div class="qa-item"><div class="qa-q">Q9：双证上姓名和身份证不一致怎么办？</div><div class="qa-a">系统会自动弹出"曾用名证明"，上传曾用名证明即可。</div></div></div></div><button class="add-card-btn" onclick="showAddCard('onboard')">＋ 新增卡片</button></div><div class="tab-panel" id="panel-subsidy"><div class="page-title"><span class="pt-icon">💰</span> 通用报销指南</div><div class="card"><div class="card-header"><span class="icon">🏥</span><h2>体检报销</h2><button class="card-edit-btn" onclick="editCard('subsidy',0)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('subsidy',0)">🗑 删除</button></div><div class="card-body"><div class="section-title">报销范围</div><p>附近无爱康或第三方体检机构，<strong>自行选择三甲医院 / 正规机构</strong>体检的人员。</p><div class="section-title">报销方式</div><p>请按照下方抬头开具发票并留存，活动结束后会有统一的人员进行发票对接。</p><div class="section-title">报销标准</div><ul><li>自行体检报销费用仅限 <strong>人民币 250 元以内</strong>，超出部分请自费</li><li>开票类型：<strong>普通发票</strong>即可</li><li>统一开具<strong>浩鲸云计算科技股份有限公司</strong>抬头</li></ul><div class="info-box" style="margin-top:14px"><div class="label">📄 发票抬头信息</div><p><strong>公司名称：</strong>浩鲸云计算科技股份有限公司</p><p><strong>税号：</strong>91320100745379000T</p><p><strong>开户行及账号：</strong>招商银行股份有限公司南京分行城东支行&nbsp;252681183310001</p><p><strong>地址及电话：</strong>南京市雨花台区软件大道178号1幢&nbsp;025-66669555</p></div></div></div><button class="add-card-btn" onclick="showAddCard('subsidy')">＋ 新增卡片</button></div><div class="tab-panel" id="panel-salary"><div class="page-title"><span class="pt-icon">💳</span> 工资卡办理</div><div class="card"><div class="card-header"><span class="icon">👤</span><h2>办卡对象</h2><button class="card-edit-btn" onclick="editCard('salary',0)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('salary',0)">🗑 删除</button></div><div class="card-body"><div class="tip-box"><div class="label">注意</div><p>无招商银行卡，也无中信银行卡的同学。若已持有两类卡中的任意一类，<strong>无需再办理新卡</strong>。</p></div></div></div><div class="card"><div class="card-header"><span class="icon">🏦</span><h2>办理方式</h2><button class="card-edit-btn" onclick="editCard('salary',1)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('salary',1)">🗑 删除</button></div><div class="card-body"><table><thead><tr><th>入职活动地</th><th>办理方式</th><th>银行卡类别</th></tr></thead><tbody><tr><td>南京会场报到</td><td>现场办卡，现场激活</td><td>中信银行</td></tr><tr><td>其他地区报到</td><td>银行邮寄实体卡，收到后请自行到附近网点激活</td><td>中信银行</td></tr></tbody></table></div></div><div class="card"><div class="card-header"><span class="icon">❓</span><h2>常见问题 Q&amp;A</h2><button class="card-edit-btn" onclick="editCard('salary',2)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('salary',2)">🗑 删除</button></div><div class="card-body"><div class="qa-item"><div class="qa-q">Q1：活动地址和入职方式如何确认？</div><div class="qa-a">请关注钉钉信息推送，群内会进行入职活动地与办卡驻地推送。（注意：银行卡办理方式根据入职活动地参考）</div></div><div class="qa-item"><div class="qa-q">Q2：现场办理当天需要准备哪些材料？</div><div class="qa-a">请准备<strong>个人身份证原件</strong>及<strong>手机</strong>即可。</div></div><div class="qa-item"><div class="qa-q">Q3：其他地区报到的同学，工资卡如何领取并激活？</div><div class="qa-a">采用线上远程方式办理入职，工资卡以线上邮寄形式发送至前期自行在表格中填写的地址，收到后请自行到附近网点激活。</div></div><div class="qa-item"><div class="qa-q">Q4：南京线下参与活动，实体卡如何领取？</div><div class="qa-a">工作人员会组织固定时间，<strong>现场开卡、现场激活、现场发放</strong>。</div></div><div class="qa-item"><div class="qa-q">Q5：如何绑定公司财务系统？</div><div class="qa-a">公司【财务在线系统】将于<strong>入职第二天激活</strong>。<br>维护银行卡号路径：登录鲸+系统 → 数字化应用 → 财务在线 → 个人中心 → 用户银行 → 新增</div></div></div></div><button class="add-card-btn" onclick="showAddCard('salary')">＋ 新增卡片</button></div><div class="tab-panel" id="panel-bus"><div class="page-title"><span class="pt-icon">🚌</span> 班车路线</div><div class="card"><div class="card-header"><span class="icon">🚌</span><h2>公司班车</h2><button class="card-edit-btn" onclick="editCard('bus',0)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('bus',0)">🗑 删除</button></div><div class="card-body"><div class="tip-box"><div class="label">📍 覆盖范围</div><p>班车服务仅限<strong>南京总部</strong>员工使用。</p></div><div class="section-title">早班接驳</div><div class="route-card"><div class="route-title">线路一 · 1号线天隆寺站</div><div class="route-row"><span class="key">接驳时间</span><span>8:30 - 8:50，共 6 趟</span></div><div class="route-row"><span class="key">停靠地点</span><span>天隆寺地铁站（公交站）</span></div><div class="route-row"><span class="key">车头显示</span><span>浩鲸天隆寺</span></div></div><div class="route-card"><div class="route-title">线路二 · 10号线小行站</div><div class="route-row"><span class="key">接驳时间</span><span>8:30 - 8:50，共 2 趟</span></div><div class="route-row"><span class="key">停靠地点</span><span>26路终点站 - 小行小区（公交站）</span></div><div class="route-row"><span class="key">车头显示</span><span>浩鲸小行</span></div></div><div class="section-title">晚班接驳</div><div class="route-card"><div class="route-row"><span class="key">发车时间</span><span>20:00 - 21:00（每 30 分钟一趟）</span></div><div class="route-row"><span class="key">上车地点</span><span>F栋楼下 IP 公仔附近</span></div></div><div class="section-title">乘车小贴士</div><ul><li>接驳车为公司员工专属，乘车时请<strong>主动出示工卡</strong></li><li>请有序排队乘车，不要在车内饮食，保持车厢整洁</li><li>接驳车会根据实际通勤人流微调发车频次，遇堵车、天气等特殊情况将在公司群内实时通知</li><li>早班共 6 趟车，接完没人 / 坐满就走，请大家 <strong>8:40 之前</strong> 到站等车</li></ul></div></div><div class="card"><div class="card-header"><span class="icon">🏙️</span><h2>园区接驳车</h2><button class="card-edit-btn" onclick="editCard('bus',1)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('bus',1)">🗑 删除</button></div><div class="card-body"><div class="route-card"><div class="route-row"><span class="key">运行时段</span><span>早高峰 7:30 - 9:30 &nbsp;|&nbsp; 晚高峰 17:30 - 19:30</span></div><div class="route-row"><span class="key">班次密度</span><span>5 分钟 / 班循环接驳</span></div><div class="route-row"><span class="key">车头显示</span><span>接驳 → AI镜界</span></div></div><div class="section-title">停靠站点（从始发站依次）</div><ol><li>天隆寺地铁站 3 号出入口（始发站）</li><li>宁双路东（紫创园、润和）</li><li>宁双路西（沁恒、天溯科技园）</li><li>云密路北（云密城）</li><li>天溯科技园</li></ol></div></div><button class="add-card-btn" onclick="showAddCard('bus')">＋ 新增卡片</button></div><div class="tab-panel" id="panel-party"><div class="page-title"><span class="pt-icon">🏛️</span> 党组织关系转移</div><div class="card"><div class="card-header"><span class="icon">📋</span><h2>南京驻地转入要求</h2><button class="card-edit-btn" onclick="editCard('party',0)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('party',0)">🗑 删除</button></div><div class="card-body"><div class="section-title">转入审核要求</div><p>所有转入党员（无论省内或省外）都需要提供<strong>党员档案</strong>进行审核：</p><ul><li><strong>预备党员：</strong>须提取整本纸质档案审核</li><li><strong>正式党员：</strong>线上发起转接流程时需同步上传<strong>《入党志愿书》</strong>以便审核</li><li><strong>省外转入：</strong>如遇到系统无法上传的情况，线下提供《入党志愿书》电子档用于审核</li></ul></div></div><div class="card"><div class="card-header"><span class="icon">🔄</span><h2>转接流程</h2><button class="card-edit-btn" onclick="editCard('party',1)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('party',1)">🗑 删除</button></div><div class="card-body"><div class="section-title">省内转接</div><p>对方党组织通过全国党员系统搜索<strong>「浩鲸云计算科技股份有限公司党支部」</strong>即可。</p><div class="section-title">省外转接</div><p>党员信息系统已全国联网（部队和部分央管企业除外），全国党员转接可通过线上办理，<strong>纸质介绍信全面取消</strong>。</p><p>对方党组织通过全国党员系统搜索<strong>「中共南京市江宁区委江宁经济技术开发区工作委员会」</strong>即可。</p><div class="tip-box"><div class="label">⚠ 重要</div><p>请勿直接转接至具体支部，否则无法收到党员转接信息！收到党员转入信息后，组织办会通知党员和党务工作者。</p></div></div></div><div class="card"><div class="card-header"><span class="icon">📞</span><h2>注意事项 &amp; 咨询方式</h2><button class="card-edit-btn" onclick="editCard('party',2)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('party',2)">🗑 删除</button></div><div class="card-body"><div class="section-title">前置条件</div><p>所有转入南京驻地的党员（无论省内或省外）必须要<strong>签订了三方协议</strong>后方可转入。</p><div class="section-title">预备党员</div><p>如果学生为预备党员且到转正时间，关系还在学校的，需<strong>在学校完成转正后</strong>方可把党关系转到公司。</p><div class="section-title">其他驻地</div><p>建议非南京驻地的员工，优先转到<strong>工作驻地的社区、街道</strong>，便于当地组织党建活动。</p><div class="info-box"><div class="label">📞 咨询方式</div><p>如有任何疑问可咨询：<strong>王甜甜</strong></p><p>电话：<strong>15651811117</strong></p></div></div></div><div class="card"><div class="card-header"><span class="icon">👥</span><h2>团员组织关系</h2><button class="card-edit-btn" onclick="editCard('party',3)">✏ 编辑</button><button class="card-del-btn" onclick="deleteCard('party',3)">🗑 删除</button></div><div class="card-body"><div class="tip-box"><div class="label">📢 说明</div><p>团员组织关系公司<strong>不接收</strong>，建议<strong>转回生源地</strong>。</p><p>（转正前公司无法接收，转正后如需转可咨询王甜甜走审核流程）</p></div></div></div><button class="add-card-btn" onclick="showAddCard('party')">＋ 新增卡片</button></div></main>
+</div>
+
+<div class="footer">浩鲸云计算科技股份有限公司 · 2026校招入职指南</div>
+
+<!-- 密码弹窗 -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal">
+    <h3>🔒 管理员登录</h3>
+    <div class="form-group">
+      <label>管理员密码</label>
+      <input type="password" id="input-pwd" placeholder="请输入密码" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="err-msg" id="pwd-err" style="display: none;">密码错误，请重试</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-login')">取消</button>
+      <button class="btn-confirm" onclick="doLogin()">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- 编辑卡片弹窗 -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal" style="max-width:680px">
+    <h3>✏ 编辑卡片内容</h3>
+    <div class="form-group">
+      <label>图标（Emoji）</label>
+      <input type="text" id="edit-icon" placeholder="如 🏥">
+    </div>
+    <div class="form-group">
+      <label>卡片标题</label>
+      <input type="text" id="edit-title" placeholder="卡片标题">
+    </div>
+    <div class="form-group">
+      <label>内容（直接编辑文字即可）</label>
+      <div class="edit-area" id="edit-body" contenteditable="true"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-edit')">取消</button>
+      <button class="btn-confirm" onclick="saveEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增指南弹窗 -->
+<div class="modal-overlay" id="modal-add-guide">
+  <div class="modal">
+    <h3>➕ 新增指南分类</h3>
+    <div class="form-group">
+      <label>图标（Emoji）</label>
+      <input type="text" id="new-guide-icon" placeholder="如 📝">
+    </div>
+    <div class="form-group">
+      <label>指南名称</label>
+      <input type="text" id="new-guide-title" placeholder="如 住宿安排指南">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-add-guide')">取消</button>
+      <button class="btn-confirm" onclick="doAddGuide()">新增</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增卡片弹窗 -->
+<div class="modal-overlay" id="modal-add-card">
+  <div class="modal">
+    <h3>➕ 新增卡片</h3>
+    <div class="form-group">
+      <label>图标（Emoji）</label>
+      <input type="text" id="new-card-icon" placeholder="如 📄">
+    </div>
+    <div class="form-group">
+      <label>卡片标题</label>
+      <input type="text" id="new-card-title" placeholder="卡片标题">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-add-card')">取消</button>
+      <button class="btn-confirm" onclick="doAddCard()">新增</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">已进入管理员模式，编辑完成后自动保存</div>
+
+<script>
+const ADMIN_PASSWORD = 'haojing2026';
+const QR_B64 = 'data:image/png;base64,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';
+
+/*__DATA_START__*/
+const INITIAL_DATA = {"guides":[{"id":"medical","icon":"🏥","title":"体检指南","cards":[{"id":"c1","icon":"🏨","title":"体检机构 & 预约方式","html":"<div class=\"section-title\">优先选择：公司合作机构 — 爱康国宾</div><p>需提前 <strong>3个工作日</strong> 通过以下二维码自助扫码预约：</p><div style=\"margin:14px 0\"><img src=\"{{QR}}\" style=\"width:180px;height:180px;display:block;border:1px solid #e2e8f0;border-radius:8px\" alt=\"体检预约二维码\"/><p style=\"font-size:12px;color:#718096;margin-top:6px\">微信扫码预约体检</p></div><div class=\"section-title\">无爱康国宾的城市</div><p>条件允许的情况下推荐前往临近城市合作机构体检；若距离过远，可自行选择<strong>三甲及以上医院 / 正规体检机构</strong>。</p><div class=\"section-title\">体检截止时间</div><div class=\"tip-box\"><div class=\"label\">⏰ 重要</div><p>请在 <strong>5月17日前</strong> 完成体检。</p></div><div class=\"section-title\">爱康国宾预约流程</div><ol class=\"step-list\"><li>微信扫码，进入界面后点击「预约」</li><li>登录账号：<strong>个人身份证号</strong>，默认密码：<strong>123123</strong></li><li>点击预约，核对个人信息，就近选择体检城市、机构及时间</li></ol>"},{"id":"c2","icon":"🩺","title":"体检项目（必检六项）","html":"<div class=\"info-box\"><div class=\"label\">📋 必检项目</div><p>血常规 &nbsp;|&nbsp; 尿常规 &nbsp;|&nbsp; 肝功能 &nbsp;|&nbsp; 心电图 &nbsp;|&nbsp; 腹部彩超（肝胆胰脾肾）&nbsp;|&nbsp; 胸透</p></div><p style=\"margin-top:10px\">以上六项<strong>缺一不可</strong>，自行选择机构时请提前确认项目是否齐全，避免遗漏。</p>"},{"id":"c3","icon":"💰","title":"体检费用报销","html":"<div class=\"section-title\">公司合作机构（爱康国宾）</div><p>无需自行支付体检费用，预约后携带<strong>身份证</strong>直接前往线下体检即可。</p><div class=\"section-title\">自行选择机构</div><p>需先行支付，报销费用仅限 <strong>250元以内</strong>，超出部分由个人承担。体检完成后请按以下抬头开具发票留存，正式入职后统一安排报销对接。</p><div class=\"info-box\" style=\"margin-top:12px\"><div class=\"label\">📄 发票抬头信息</div><p><strong>发票类型：</strong>普通发票即可</p><p><strong>公司名称：</strong>浩鲸云计算科技股份有限公司</p><p><strong>纳税人识别号：</strong>91320100745379000T</p><p><strong>地址及电话：</strong>南京市雨花台区软件大道178号1幢&nbsp;025-66669555</p><p><strong>开户行及账号：</strong>招商银行股份有限公司南京城东支行&nbsp;252681183310001</p></div><div class=\"tip-box\" style=\"margin-top:14px\"><div class=\"label\">💡 体检注意事项</div><p>体检前1-2天请保持清淡饮食，勿熬夜饮酒；体检当天务必<strong>空腹</strong>前往；女性请避开生理期。</p></div>"}]},{"id":"onboard","icon":"📋","title":"入职材料上传","cards":[{"id":"c1","icon":"🔗","title":"提交路径","html":"<div class=\"info-box\"><div class=\"label\">📌 提交入口</div><p><strong>提交链接：</strong>https://ruzhi.iwhalecloud.com/</p><p><strong>登录方式：</strong>姓名 + 手机号 + 验证码</p></div>"},{"id":"c2","icon":"📅","title":"提交时间","html":"<ol class=\"step-list\"><li>05月27日：开放提交路径的链接通道</li><li>06月15日：完成除双证及学信网以外所有电子版材料的上传（若双证 &amp; 学信网在06月15日前拿到，一并提交即可）</li><li>中途可添加材料，点击保存草稿；已有的资料先提交上传</li></ol>"},{"id":"c3","icon":"📄","title":"材料明细","html":"<ul><li><strong>个人信息填写：</strong>家庭住址精确到门牌号；工作经历至少填写三段（不满三段填\"无\"，实习经历可填写）；培训经历非必填</li><li><strong>身份证：</strong>图片格式，国徽面 + 照片面，清晰完整，<strong>勿添加任何水印</strong></li><li><strong>学历证书：</strong>图片格式，学位证 + 毕业证，清晰完整，无水印</li><li><strong>教育部学历 / 学位 / 学籍电子注册备案表：</strong>图片格式，学信网下载，需露出认证报告底部二维码</li><li><strong>体检报告：</strong>PDF格式，包含必检六项</li><li><strong>白底证件照：</strong>图片格式，头部证件照，像素清晰，无遮挡无阴影</li><li><strong>英语证书：</strong>四级 / 六级证书照片（未通过四级可用学信网学籍/学历/学位验证报告代替）</li><li><strong>行业相关证书（ACP、PMP、Redhat等）：</strong>非必传</li></ul>"},{"id":"c4","icon":"❓","title":"常见问题 Q&A","html":"<div class=\"tip-box\"><div class=\"label\">📢 温馨提示</div><p>提交过程中如遇问题，请优先查看Q&amp;A；若仍有疑问可联系入职侧HR陈啟文，钉钉：18205063236（添加时请备注姓名）</p></div><div class=\"qa-item\"><div class=\"qa-q\">Q1：无法进入材料提交页面怎么办？</div><div class=\"qa-a\"><strong>电脑：</strong>切换浏览器、清除缓存、重启浏览器<br><strong>手机：</strong>核对手机号码、切换网络</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q2：登录页面显示\"姓名或手机号错误\"怎么办？</div><div class=\"qa-a\">联系HR核对手机号码。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q3：没有学位证书或英语证书怎么办？</div><div class=\"qa-a\">可使用学信网截图替代，如有问题HR会单独联系。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q4：体检报告如何下载PDF格式？</div><div class=\"qa-a\"><strong>指定机构：</strong>扫描体检预约二维码登录后可查看并下载报告<br><strong>其他机构：</strong>纸质报告拍照后转换为PDF上传</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q5：体检报告必检哪六项？</div><div class=\"qa-a\">血常规、尿常规、肝功能、心电图、腹部彩超、胸透。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q6：体检有异常项怎么办？</div><div class=\"qa-a\">上传已拿到的全部体检报告，等待HR审核。若HR未驳回并备注复查原因，则异常项不影响入职。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q7：材料上传不全可以点击提交吗？</div><div class=\"qa-a\">可先上传已有材料后点击<strong>保存草稿</strong>，待材料齐全后再点击提交。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q8：身份证、毕业证、学位证上传报错怎么办？</div><div class=\"qa-a\">三类证件均设有OCR识别，识别成功后请核对关键信息是否有误并手动修改；若OCR识别失败，可直接在右侧手动输入关键信息并确认回填。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q9：双证上姓名和身份证不一致怎么办？</div><div class=\"qa-a\">系统会自动弹出\"曾用名证明\"，上传曾用名证明即可。</div></div>"}]},{"id":"party","icon":"🏛️","title":"党组织关系转移","cards":[{"id":"c1","icon":"📋","title":"南京驻地转入要求","html":"<div class=\"section-title\">转入审核要求</div><p>所有转入党员（无论省内或省外）都需要提供<strong>党员档案</strong>进行审核：</p><ul><li><strong>预备党员：</strong>须提取整本纸质档案审核</li><li><strong>正式党员：</strong>线上发起转接流程时需同步上传<strong>《入党志愿书》</strong>以便审核</li><li><strong>省外转入：</strong>如遇到系统无法上传的情况，线下提供《入党志愿书》电子档用于审核</li></ul>"},{"id":"c2","icon":"🔄","title":"转接流程","html":"<div class=\"section-title\">省内转接</div><p>对方党组织通过全国党员系统搜索<strong>「浩鲸云计算科技股份有限公司党支部」</strong>即可。</p><div class=\"section-title\">省外转接</div><p>党员信息系统已全国联网（部队和部分央管企业除外），全国党员转接可通过线上办理，<strong>纸质介绍信全面取消</strong>。</p><p>对方党组织通过全国党员系统搜索<strong>「中共南京市江宁区委江宁经济技术开发区工作委员会」</strong>即可。</p><div class=\"tip-box\"><div class=\"label\">⚠ 重要</div><p>请勿直接转接至具体支部，否则无法收到党员转接信息！收到党员转入信息后，组织办会通知党员和党务工作者。</p></div>"},{"id":"c3","icon":"📞","title":"注意事项 & 咨询方式","html":"<div class=\"section-title\">前置条件</div><p>所有转入南京驻地的党员（无论省内或省外）必须要<strong>签订了三方协议</strong>后方可转入。</p><div class=\"section-title\">预备党员</div><p>如果学生为预备党员且到转正时间，关系还在学校的，需<strong>在学校完成转正后</strong>方可把党关系转到公司。</p><div class=\"section-title\">其他驻地</div><p>建议非南京驻地的员工，优先转到<strong>工作驻地的社区、街道</strong>，便于当地组织党建活动。</p><div class=\"info-box\"><div class=\"label\">📞 咨询方式</div><p>如有任何疑问可咨询：<strong>王甜甜</strong></p><p>电话：<strong>15651811117</strong></p></div>"},{"id":"c4","icon":"👥","title":"团员组织关系","html":"<div class=\"tip-box\"><div class=\"label\">📢 说明</div><p>团员组织关系公司<strong>不接收</strong>，建议<strong>转回生源地</strong>。</p><p>（转正前公司无法接收，转正后如需转可咨询王甜甜走审核流程）</p></div>"}]},{"id":"subsidy","icon":"💰","title":"通用报销指南","cards":[{"id":"c1","icon":"🏥","title":"体检报销","html":"<div class=\"section-title\">报销范围</div><p>附近无爱康或第三方体检机构，<strong>自行选择三甲医院 / 正规机构</strong>体检的人员。</p><div class=\"section-title\">报销方式</div><p>请按照下方抬头开具发票并留存，活动结束后会有统一的人员进行发票对接。</p><div class=\"section-title\">报销标准</div><ul><li>自行体检报销费用仅限 <strong>人民币 250 元以内</strong>，超出部分请自费</li><li>开票类型：<strong>普通发票</strong>即可</li><li>统一开具<strong>浩鲸云计算科技股份有限公司</strong>抬头</li></ul><div class=\"info-box\" style=\"margin-top:14px\"><div class=\"label\">📄 发票抬头信息</div><p><strong>公司名称：</strong>浩鲸云计算科技股份有限公司</p><p><strong>税号：</strong>91320100745379000T</p><p><strong>开户行及账号：</strong>招商银行股份有限公司南京分行城东支行&nbsp;252681183310001</p><p><strong>地址及电话：</strong>南京市雨花台区软件大道178号1幢&nbsp;025-66669555</p></div>"}]},{"id":"salary","icon":"💳","title":"工资卡办理","cards":[{"id":"c1","icon":"👤","title":"办卡对象","html":"<div class=\"tip-box\"><div class=\"label\">注意</div><p>无招商银行卡，也无中信银行卡的同学。若已持有两类卡中的任意一类，<strong>无需再办理新卡</strong>。</p></div>"},{"id":"c2","icon":"🏦","title":"办理方式","html":"<table><thead><tr><th>入职活动地</th><th>办理方式</th><th>银行卡类别</th></tr></thead><tbody><tr><td>南京会场报到</td><td>现场办卡，现场激活</td><td>中信银行</td></tr><tr><td>其他地区报到</td><td>银行邮寄实体卡，收到后请自行到附近网点激活</td><td>中信银行</td></tr></tbody></table>"},{"id":"c3","icon":"❓","title":"常见问题 Q&A","html":"<div class=\"qa-item\"><div class=\"qa-q\">Q1：活动地址和入职方式如何确认？</div><div class=\"qa-a\">请关注钉钉信息推送，群内会进行入职活动地与办卡驻地推送。（注意：银行卡办理方式根据入职活动地参考）</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q2：现场办理当天需要准备哪些材料？</div><div class=\"qa-a\">请准备<strong>个人身份证原件</strong>及<strong>手机</strong>即可。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q3：其他地区报到的同学，工资卡如何领取并激活？</div><div class=\"qa-a\">采用线上远程方式办理入职，工资卡以线上邮寄形式发送至前期自行在表格中填写的地址，收到后请自行到附近网点激活。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q4：南京线下参与活动，实体卡如何领取？</div><div class=\"qa-a\">工作人员会组织固定时间，<strong>现场开卡、现场激活、现场发放</strong>。</div></div><div class=\"qa-item\"><div class=\"qa-q\">Q5：如何绑定公司财务系统？</div><div class=\"qa-a\">公司【财务在线系统】将于<strong>入职第二天激活</strong>。<br>维护银行卡号路径：登录鲸+系统 → 数字化应用 → 财务在线 → 个人中心 → 用户银行 → 新增</div></div>"}]},{"id":"bus","icon":"🚌","title":"班车路线","cards":[{"id":"c1","icon":"🚌","title":"公司班车","html":"<div class=\"tip-box\"><div class=\"label\">📍 覆盖范围</div><p>班车服务仅限<strong>南京总部</strong>员工使用。</p></div><div class=\"section-title\">早班接驳</div><div class=\"route-card\"><div class=\"route-title\">线路一 · 1号线天隆寺站</div><div class=\"route-row\"><span class=\"key\">接驳时间</span><span>8:30 - 8:50，共 6 趟</span></div><div class=\"route-row\"><span class=\"key\">停靠地点</span><span>天隆寺地铁站（公交站）</span></div><div class=\"route-row\"><span class=\"key\">车头显示</span><span>浩鲸天隆寺</span></div></div><div class=\"route-card\"><div class=\"route-title\">线路二 · 10号线小行站</div><div class=\"route-row\"><span class=\"key\">接驳时间</span><span>8:30 - 8:50，共 2 趟</span></div><div class=\"route-row\"><span class=\"key\">停靠地点</span><span>26路终点站 - 小行小区（公交站）</span></div><div class=\"route-row\"><span class=\"key\">车头显示</span><span>浩鲸小行</span></div></div><div class=\"section-title\">晚班接驳</div><div class=\"route-card\"><div class=\"route-row\"><span class=\"key\">发车时间</span><span>20:00 - 21:00（每 30 分钟一趟）</span></div><div class=\"route-row\"><span class=\"key\">上车地点</span><span>F栋楼下 IP 公仔附近</span></div></div><div class=\"section-title\">乘车小贴士</div><ul><li>接驳车为公司员工专属，乘车时请<strong>主动出示工卡</strong></li><li>请有序排队乘车，不要在车内饮食，保持车厢整洁</li><li>接驳车会根据实际通勤人流微调发车频次，遇堵车、天气等特殊情况将在公司群内实时通知</li><li>早班共 6 趟车，接完没人 / 坐满就走，请大家 <strong>8:40 之前</strong> 到站等车</li></ul>"},{"id":"c2","icon":"🏙️","title":"园区接驳车","html":"<div class=\"route-card\"><div class=\"route-row\"><span class=\"key\">运行时段</span><span>早高峰 7:30 - 9:30 &nbsp;|&nbsp; 晚高峰 17:30 - 19:30</span></div><div class=\"route-row\"><span class=\"key\">班次密度</span><span>5 分钟 / 班循环接驳</span></div><div class=\"route-row\"><span class=\"key\">车头显示</span><span>接驳 → AI镜界</span></div></div><div class=\"section-title\">停靠站点（从始发站依次）</div><ol><li>天隆寺地铁站 3 号出入口（始发站）</li><li>宁双路东（紫创园、润和）</li><li>宁双路西（沁恒、天溯科技园）</li><li>云密路北（云密城）</li><li>天溯科技园</li></ol>"}]}]};
+/*__DATA_END__*/
+
+let data = null, activeId = null, isAdmin = false, editTarget = null, addCardTarget = null;
+
+async function loadData() {
+  // Try localStorage first (preserves admin edits between sessions)
+  const ls = localStorage.getItem('haojing_guides_cloud');
+  if (ls) { try { data = JSON.parse(ls); return; } catch(e){} }
+  data = JSON.parse(JSON.stringify(INITIAL_DATA));
+}
+
+function saveData() {
+  localStorage.setItem('haojing_guides_cloud', JSON.stringify(data));
+  autoDownload();
+}
+function autoDownload() {
+  try {
+    // Temporarily exit admin mode for clean export
+    const wasAdmin = isAdmin;
+    if (wasAdmin) { document.body.classList.remove('admin-mode'); document.getElementById('admin-bar').classList.remove('visible'); }
+    let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    if (wasAdmin) { document.body.classList.add('admin-mode'); document.getElementById('admin-bar').classList.add('visible'); }
+    const ms = '/*__DATA_START__*/';
+    const me = '/*__DATA_END__*/';
+    const si = html.indexOf(ms);
+    const ei = html.indexOf(me) + me.length;
+    if (si === -1) return;
+    const newBlock = ms + '\nconst INITIAL_DATA = ' + JSON.stringify(data) + ';\n' + me;
+    html = html.substring(0, si) + newBlock + html.substring(ei);
+    const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'index.html'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch(e) {}
+}
+
+function render() { renderSidebar(); renderContent(); if (!activeId && data.guides.length) showGuide(data.guides[0].id); }
+
+function renderSidebar() {
+  document.getElementById('sidebar-nav').innerHTML = data.guides.map((g,i) =>
+    '<div class="nav-group"><div class="nav-group-title '+(g.id===activeId?'active':'')+'" onclick="showGuide(\''+g.id+'\')" draggable="true" data-index="'+i+'" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)" ondragend="dragEnd(event)">'
+    +'<span class="drag-handle" title="拖拽排序">⠿</span><span class="nav-icon">'+g.icon+'</span><span class="nav-label">'+g.title+'</span>'
+    +'<button class="nav-del-btn" onclick="event.stopPropagation();deleteGuide(\''+g.id+'\')" title="删除">🗑</button>'
+    +'</div></div>').join('');
+}
+
+function renderContent() {
+  document.getElementById('main-content').innerHTML = data.guides.map(g =>
+    '<div class="tab-panel '+(g.id===activeId?'active':'')+'" id="panel-'+g.id+'">'
+    +'<div class="page-title"><span class="pt-icon">'+g.icon+'</span> '+g.title+'</div>'
+    +g.cards.map((c,ci) => renderCard(g.id,ci,c)).join('')
+    +'<button class="add-card-btn" onclick="showAddCard(\''+g.id+'\')">＋ 新增卡片</button>'
+    +'</div>').join('');
+}
+
+function renderCard(gid,ci,c) {
+  const html = c.html.split('{{QR}}').join(QR_B64);
+  return '<div class="card"><div class="card-header">'
+    +'<span class="icon">'+c.icon+'</span><h2>'+c.title+'</h2>'
+    +'<button class="card-edit-btn" onclick="editCard(\''+gid+'\','+ci+')">✏ 编辑</button>'
+    +'<button class="card-del-btn" onclick="deleteCard(\''+gid+'\','+ci+')">🗑 删除</button>'
+    +'</div><div class="card-body">'+html+'</div></div>';
+}
+
+function showGuide(id) {
+  activeId = id;
+  renderSidebar();
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-'+id);
+  if (panel) panel.classList.add('active');
+  const g = data.guides.find(g=>g.id===id);
+  document.getElementById('mobile-title').textContent = g ? g.title : '';
+  if (window.innerWidth<=700) closeSidebar();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === 'G') {
+    showLogin();
+  }
+});
+function showLogin() {
+  document.getElementById('input-pwd').value='';
+  document.getElementById('pwd-err').style.display='none';
+  openModal('modal-login');
+  setTimeout(()=>document.getElementById('input-pwd').focus(),100);
+}
+function doLogin() {
+  if (document.getElementById('input-pwd').value===ADMIN_PASSWORD) {
+    closeModal('modal-login'); enterAdmin();
+  } else { document.getElementById('pwd-err').style.display='block'; }
+}
+function enterAdmin() {
+  isAdmin=true;
+  document.body.classList.add('admin-mode');
+  document.getElementById('admin-bar').classList.add('visible');
+  showToast('已进入管理员模式，编辑完成后自动保存');
+}
+function exitAdmin() {
+  isAdmin=false;
+  document.body.classList.remove('admin-mode');
+  document.getElementById('admin-bar').classList.remove('visible');
+}
+
+function editCard(gid,ci) {
+  const c = data.guides.find(g=>g.id===gid).cards[ci];
+  editTarget={gid,ci};
+  document.getElementById('edit-icon').value=c.icon;
+  document.getElementById('edit-title').value=c.title;
+  document.getElementById('edit-body').innerHTML=c.html.split('{{QR}}').join(QR_B64);
+  openModal('modal-edit');
+}
+function saveEdit() {
+  if (!editTarget) return;
+  const {gid,ci} = editTarget;
+  const guide = data.guides.find(g=>g.id===gid);
+  const icon = document.getElementById('edit-icon').value.trim() || guide.cards[ci].icon;
+  const title = document.getElementById('edit-title').value.trim() || guide.cards[ci].title;
+  let html = document.getElementById('edit-body').innerHTML;
+  html = html.split(QR_B64).join('{{QR}}');
+  guide.cards[ci]={...guide.cards[ci],icon,title,html};
+  closeModal('modal-edit');
+  renderContent();
+  showGuide(activeId);
+  saveData();
+}
+function deleteCard(gid,ci) {
+  if (!confirm('确定删除这张卡片吗？')) return;
+  data.guides.find(g=>g.id===gid).cards.splice(ci,1);
+  renderContent(); showGuide(activeId);
+  saveData();
+}
+function showAddCard(gid) {
+  addCardTarget=gid;
+  document.getElementById('new-card-icon').value='';
+  document.getElementById('new-card-title').value='';
+  openModal('modal-add-card');
+}
+function doAddCard() {
+  const icon=document.getElementById('new-card-icon').value.trim()||'📄';
+  const title=document.getElementById('new-card-title').value.trim();
+  if (!title) { alert('请填写卡片标题'); return; }
+  data.guides.find(g=>g.id===addCardTarget).cards.push({id:'c'+Date.now(),icon,title,html:'<p>请点击「✏ 编辑」按钮填写内容。</p>'});
+  closeModal('modal-add-card'); renderContent(); showGuide(activeId);
+  saveData();
+}
+function showAddGuide() {
+  document.getElementById('new-guide-icon').value='';
+  document.getElementById('new-guide-title').value='';
+  openModal('modal-add-guide');
+}
+function doAddGuide() {
+  const icon=document.getElementById('new-guide-icon').value.trim()||'📝';
+  const title=document.getElementById('new-guide-title').value.trim();
+  if (!title) { alert('请填写指南名称'); return; }
+  const id='guide_'+Date.now();
+  data.guides.push({id,icon,title,cards:[{id:'c1',icon:'📄',title:'指南内容',html:'<p>请点击「✏ 编辑」按钮填写内容。</p>'}]});
+  closeModal('modal-add-guide'); render(); showGuide(id);
+  saveData();
+}
+function deleteGuide(gid) {
+  if (!confirm('确定删除整个指南分类吗？此操作不可撤销。')) return;
+  data.guides=data.guides.filter(g=>g.id!==gid);
+  render(); if (data.guides.length) showGuide(data.guides[0].id);
+  saveData();
+}
+
+// Drag-and-drop reorder
+let dragSrcIndex = null;
+function dragStart(e) {
+  if (!isAdmin) { e.preventDefault(); return; }
+  dragSrcIndex = parseInt(e.currentTarget.dataset.index);
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragOver(e) {
+  if (!isAdmin) return;
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+function dragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+function onDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!isAdmin) return;
+  const targetIndex = parseInt(e.currentTarget.dataset.index);
+  if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+    const item = data.guides.splice(dragSrcIndex, 1)[0];
+    data.guides.splice(targetIndex, 0, item);
+    saveData();
+    render();
+    showGuide(item.id);
+  }
+  dragSrcIndex = null;
+}
+function dragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.nav-group-title').forEach(function(el){el.classList.remove('drag-over')});
+}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('open')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')}
+
+loadData().then(()=>render());
+
+// Cross-tab real-time sync
+window.addEventListener('storage', function(e) {
+  if (e.key === 'haojing_guides_cloud' && e.newValue) {
+    try {
+      data = JSON.parse(e.newValue);
+      render();
+      if (data.guides.length) showGuide(data.guides[0].id);
+      showToast('已同步其他窗口的更新');
+    } catch(ex) {}
+  }
+});
+</script>
+
+
+</body></html>
